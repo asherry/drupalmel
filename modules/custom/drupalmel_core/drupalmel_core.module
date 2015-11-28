@@ -29,3 +29,70 @@ function drupalmel_core_ctools_plugin_directory($owner, $plugin_type) {
     return "plugins/{$owner}";
   }
 }
+
+/**
+ * Implements hook_block_info().
+ */
+function drupalmel_core_block_info() {
+  $info = array();
+
+  $info['github_fork'] = array(
+    'info' => t('Fork me on github.com'),
+  );
+
+  return $info;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function drupalmel_core_block_view($delta = '') {
+  $block = array();
+
+  switch ($delta) {
+    case 'github_fork':
+      $block['content'] = drupalmel_core_widget_github_fork();
+    break;
+  }
+
+  return $block;
+}
+
+/**
+ * Implements hook_preprocess_html().
+ */
+function drupalmel_core_preprocess_html(&$vars) {
+  $vars['page']['page_top']['github_fork']['#markup'] = drupalmel_core_widget_github_fork();
+}
+
+/**
+ * Implements hook_block_configure().
+ */
+function drupalmel_core_block_configure($delta = '') {
+  // This example comes from node.module.
+  $form = array();
+  if ($delta == 'recent') {
+    $form['node_recent_block_count'] = array(
+      '#type' => 'select',
+      '#title' => t('Number of recent content items to display'),
+      '#default_value' => variable_get('node_recent_block_count', 10),
+      '#options' => drupal_map_assoc(array(2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 25, 30)),
+    );
+  }
+  return $form;
+}
+
+/**
+ * Implements hook_block_save().
+*/
+function drupalmel_core_block_save($delta = '', $edit = array()) {
+ // This example comes from node.module.
+  if ($delta == 'recent') {
+    variable_set('node_recent_block_count', $edit['node_recent_block_count']);
+  }
+}
+
+function drupalmel_core_widget_github_fork() {
+  return '<a style="display: block; position: fixed; top: 130px; right: 0; border: 0;" href="https://github.com/you"><img src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>';
+}
+
